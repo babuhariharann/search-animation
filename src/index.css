@@ -1,0 +1,48 @@
+/* font family */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+
+
+:root {
+
+  --font-inter: "Inter", sans-serif;
+
+  --bg-color-01: #E0E0E0;
+  --white: #ffffff;
+  --black: #000;
+  --black-200: #2a2a2a;
+
+  --bg-highlight: #ffe4c5;
+
+  --bg-gray-200: #f1f1f1;
+  --bg-gray-300: #f2f2f2;
+  --bg-gray-400: #dfdfdf;
+  --bg-gray-500: #eaeaea;
+  --bg-gray-600: #f4f4f4;
+
+  --text-color-01: #9d9d9d;
+  --text-color-02: #a8a8a8;
+  --text-color-03: #858585;
+  --text-color-04: #717171;
+
+  --green: #18dc16;
+  --yellow: #fbc301;
+
+  --card-padding-x: 25px;
+  --not-expand-height: 70px;
+  --expand-height: 500px
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: var(--font-inter);
+}
+
+.react-tooltip {
+  padding: 3px 8px !important;
+  font-size: 12px !important;
+  border-radius: 5px !important;
+}

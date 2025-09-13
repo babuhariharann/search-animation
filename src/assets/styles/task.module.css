@@ -1,0 +1,533 @@
+.container {
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-color-01);
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.searchContainer {
+    background: var(--white);
+    width: 100%;
+    max-width: 580px;
+    border-radius: 15px;
+    box-shadow: 0px 0px 10px #00000042;
+    overflow: hidden;
+    height: var(--not-expand-height);
+    transition: height 0.6s ease-in-out;
+}
+
+.searchContainer.notExpand {
+    height: var(--not-expand-height);
+}
+
+.searchContainer.expand {
+    height: var(--expand-height);
+}
+
+.header {
+    padding: 10px 25px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.headerLeft {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 10px;
+    height: 100%;
+    width: 100%;
+}
+
+.headerSearchIcon {
+    font-size: 23px;
+    color: var(--text-color-01);
+}
+
+.pump {
+    animation: pump 0.4s ease-in-out;
+}
+
+@keyframes pump {
+    0% {
+        transform: scale(1);
+    }
+
+    30% {
+        transform: scale(1.1);
+    }
+
+    60% {
+        transform: scale(0.9);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.headerInput {
+    border: none;
+    outline: none;
+    background: transparent;
+    height: 100%;
+    width: 100%;
+    font-size: 21px;
+    font-weight: 550;
+}
+
+.headerInput::placeholder {
+    color: var(--text-color-01);
+    font-weight: 400;
+    font-size: 20px;
+}
+
+.borderLessButton {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-weight: 550;
+    font-size: 14px;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.searchLoaderWrapper {
+    min-width: 25px;
+    min-height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* spinner css - start */
+
+.loader {
+    width: 20px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 2px solid var(--text-color-01);
+    ;
+    animation:
+        l20-1 0.8s infinite linear alternate,
+        l20-2 1.6s infinite linear;
+}
+
+@keyframes l20-1 {
+    0% {
+        clip-path: polygon(50% 50%, 0 0, 50% 0%, 50% 0%, 50% 0%, 50% 0%, 50% 0%)
+    }
+
+    12.5% {
+        clip-path: polygon(50% 50%, 0 0, 50% 0%, 100% 0%, 100% 0%, 100% 0%, 100% 0%)
+    }
+
+    25% {
+        clip-path: polygon(50% 50%, 0 0, 50% 0%, 100% 0%, 100% 100%, 100% 100%, 100% 100%)
+    }
+
+    50% {
+        clip-path: polygon(50% 50%, 0 0, 50% 0%, 100% 0%, 100% 100%, 50% 100%, 0% 100%)
+    }
+
+    62.5% {
+        clip-path: polygon(50% 50%, 100% 0, 100% 0%, 100% 0%, 100% 100%, 50% 100%, 0% 100%)
+    }
+
+    75% {
+        clip-path: polygon(50% 50%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 50% 100%, 0% 100%)
+    }
+
+    100% {
+        clip-path: polygon(50% 50%, 50% 100%, 50% 100%, 50% 100%, 50% 100%, 50% 100%, 0% 100%)
+    }
+}
+
+@keyframes l20-2 {
+    0% {
+        transform: scaleY(1) rotate(0deg)
+    }
+
+    49.99% {
+        transform: scaleY(1) rotate(135deg)
+    }
+
+    50% {
+        transform: scaleY(-1) rotate(0deg)
+    }
+
+    100% {
+        transform: scaleY(-1) rotate(-135deg)
+    }
+}
+
+/* spinner css - end */
+
+
+.bodyActions {
+    border-bottom: 1px solid var(--bg-gray-200);
+    padding-left: var(--card-padding-x);
+    padding-right: var(--card-padding-x);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.tabs {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+
+.tabButton {
+    display: flex;
+    align-items: center;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    color: var(--text-color-02);
+    position: relative;
+    cursor: pointer;
+    height: 35px;
+
+    opacity: 0;
+    transform: scale(0.9) translateY(-10px);
+    animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.tabButton.active {
+    color: var(--black);
+}
+
+.tabButton.active::after {
+    position: absolute;
+    content: '';
+    width: 100%;
+    height: 2px;
+    background: var(--black);
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.tabIcon {
+    margin-right: 5px;
+    display: flex;
+    align-items: center;
+    color: var(--text-color-02);
+}
+
+.tabButton .count {
+    background: var(--bg-gray-200);
+    font-size: 13px;
+    margin-left: 10px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: var(--text-color-02);
+    min-width: 20px;
+}
+
+.settingContainer {
+    position: relative;
+}
+
+.settingBtn {
+    border: none;
+    outline: none;
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+
+}
+
+.settingBtn svg {
+    font-size: 20px;
+    color: var(--text-color-02);
+    transition: transform 0.3s ease-in-out
+}
+
+.settingBtn.open svg {
+    transform: rotate(60deg);
+}
+
+.settingBtn.close svg {
+    transform: rotate(0deg);
+}
+
+.settingList {
+    padding: 5px;
+    box-shadow: 0px 0px 3px #00000042;
+    border-radius: 10px;
+    position: absolute;
+    top: 35px;
+    right: 0;
+    z-index: 3;
+    background: var(--white);
+    width: 200px;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+}
+
+.settingList.opened {
+    max-height: 155px;
+    opacity: 1;
+    padding: 5px;
+}
+
+.settingList li {
+    list-style-type: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: space-between;
+    padding: 8px;
+    border-radius: 5px;
+}
+
+.settingList li:hover {
+    background: var(--bg-gray-600);
+    transition: all 0.3s ease-in-out;
+}
+
+.settingList li:last-child {
+    margin-bottom: 0px;
+}
+
+.liLeft {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.settingLiIcon {
+    color: var(--text-color-02);
+    display: flex;
+    align-items: center;
+}
+
+.settingLiName {
+    color: var(--text-color-02);
+}
+
+.settingLiName.active {
+    color: var(--black);
+}
+
+/* toggle - start */
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 30px;
+    height: 17px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--bg-gray-500);
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 13px;
+    width: 13px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked+.slider {
+    background-color: var(--black);
+}
+
+input:focus+.slider {
+    box-shadow: 0 0 1px var(--black);
+}
+
+input:checked+.slider:before {
+    -webkit-transform: translateX(13px);
+    -ms-transform: translateX(13px);
+    transform: translateX(13px);
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 50px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+/* toggle - end */
+
+.bodyListContainer {
+    padding-left: var(--card-padding-x);
+    padding-right: var(--card-padding-x);
+    height: calc(var(--expand-height) - var(--not-expand-height) - 45px);
+    overflow-y: auto;
+    scrollbar-width: none;
+    margin-top: 10px;
+}
+
+.dataList {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--bg-gray-200);
+}
+
+.dataList:last-child {
+    border: none;
+}
+
+.loaderList {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--bg-gray-200);
+}
+
+.loaderList:last-child {
+    border: none;
+}
+
+.dataListContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.dataListContent {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.profileWrapper {
+    min-width: 35px;
+    width: 35px;
+    max-width: 35px;
+    min-height: 35px;
+    height: 35px;
+    max-height: 35px;
+    position: relative;
+    border-radius: 8px;
+    z-index: 1;
+}
+
+.profileWrapper::after {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    z-index: 2;
+    border: 2px solid var(--white);
+}
+
+.profileWrapper.active::after {
+    background: var(--green);
+}
+
+.profileWrapper.offline::after {
+    background: var(--yellow);
+}
+
+.profileWrapper img {
+    min-width: 100%;
+    width: 100%;
+    max-width: 100%;
+    min-height: 100%;
+    height: 100%;
+    max-height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.iconWrapper {
+    min-width: 35px;
+    width: 35px;
+    max-width: 35px;
+    min-height: 35px;
+    height: 35px;
+    max-height: 35px;
+    position: relative;
+    border-radius: 8px;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-gray-300);
+    color: var(--text-color-03);
+}
+
+.dataListName {
+    font-size: 15px;
+    font-weight: 500
+}
+
+.dataListDesc {
+    font-size: 13px;
+    color: var(--text-color-02);
+}
+
+.split {
+    vertical-align: middle;
+}
+
+.split svg {
+    font-size: 8px;
+    margin: 0px 3px 2px 3px;
+
+}
+
+
+/* media */
+
+@media(max-width:575px) {
+    .tabIcon {
+        display: none;
+    }
+
+    .tabButton .count {
+        display: none;
+    }
+}

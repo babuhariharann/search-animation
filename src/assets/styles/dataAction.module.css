@@ -1,0 +1,81 @@
+.dataActions {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.iconButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--text-color-02);
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+.iconButton:hover {
+    color: var(--text-color-04);
+}
+
+.linkButton {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--text-color-02);
+}
+
+.linkButton {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--text-color-02);
+    transition: all 0.3s ease-in-out;
+    position: relative;
+}
+
+.linkButton:hover {
+    background: var(--bg-gray-400);
+    color: var(--text-color-04);
+}
+
+.copyStatus {
+    position: absolute;
+    background: var(--black-200);
+    color: var(--white);
+    padding: 3px 5px;
+    border-radius: 4px;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.tooltipText {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.copySuccess {
+    font-size: 14px;
+}
