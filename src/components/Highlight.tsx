@@ -9,7 +9,9 @@ const Highlight: React.FC<HighlightProps> = ({ text, highlight }) => {
   if (!highlight.trim()) return <>{text}</>;
 
   const regex = new RegExp(`(${highlight})`, "gi");
+  console.log("regex", regex);
   const parts = text.split(regex);
+  console.log("parts", parts);
 
   return (
     <>

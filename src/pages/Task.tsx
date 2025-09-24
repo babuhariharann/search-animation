@@ -1,5 +1,5 @@
 /** package import */
-import React, { useState } from "react";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { RiSearchLine } from "react-icons/ri";
 import { IoSettingsOutline } from "react-icons/io5";
@@ -38,37 +38,40 @@ interface SettingData {
   isChecked: boolean;
 }
 
-// interface InitialStates {
-//   settingOpen: boolean;
-// }
-// const initialState: InitialStates = {
-//   settingOpen: false,
-// };
+interface State {
+  search: string;
+  isExpand: boolean;
+  loading: boolean;
+  settingOpen: boolean;
+  activeTab: string;
+  datas: DataItem[];
+  linkCopied: string | null;
+  enableActions: number | null;
+  tabsOptions: TabsOptions[];
+}
+type Action =
+  | { type: "SET_SEARCH"; payload: string }
+  | { type: "SET_EXPAND"; payload: boolean }
+  | { type: "SET_LOADING"; payload: boolean }
+  | { type: "SET_SETTING_OPEN"; payload: boolean }
+  | { type: "SET_ACTIVE_TAB"; payload: string }
+  | { type: "SET_DATAS"; payload: DataItem[] }
+  | { type: "SET_LINK_COPIED"; payload: string | null }
+  | { type: "SET_ENABLE_ACTIONS"; payload: number | null }
+  | { type: "UPDATE_TABS"; payload: TabsOptions[] }
+  | { type: "TOGGLE_TAB_VISIBILITY"; payload: string };
 
-const Task = () => {
-  const [search, setSearch] = useState<string>("");
-  const [isExpand, setIsExpand] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [settingOpen, setSettingOpen] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<string>("All");
-  const [datas, setDatas] = useState<DataItem[]>([]);
-  // const [datas, setDatas] = useState<DataItem[]>(dataList);
-  const [linkCopied, setLinkCopied] = useState<null | string>(null);
-  const [enableActions, setEnableActions] = useState<null | number>(null);
-
-  // const reducerFunction = () => {};
-
-  // const [state, dispatch] = useReducer(reducerFunction, initialState);
-
-  const [tabsOptions, setTabsOptions] = useState<TabsOptions[]>([
-    {
-      id: 1,
-      name: "All",
-      isIcon: null,
-      iconSize: undefined,
-      count: 0,
-      isShown: true,
-    },
+const initialState: State = {
+  search: "",
+  isExpand: false,
+  loading: false,
+  settingOpen: false,
+  activeTab: "All",
+  datas: [],
+  linkCopied: null,
+  enableActions: null,
+  tabsOptions: [
+    { id: 1, name: "All", iconSize: 20, isIcon: null, count: 0, isShown: true },
     {
       id: 2,
       name: "Files",
@@ -101,7 +104,45 @@ const Task = () => {
       count: 0,
       isShown: false,
     },
-  ]);
+  ],
+};
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case "SET_SEARCH":
+      return { ...state, search: action.payload };
+    case "SET_EXPAND":
+      return { ...state, isExpand: action.payload };
+    case "SET_LOADING":
+      return { ...state, loading: action.payload };
+    case "SET_SETTING_OPEN":
+      return { ...state, settingOpen: action.payload };
+    case "SET_ACTIVE_TAB":
+      return { ...state, activeTab: action.payload };
+    case "SET_DATAS":
+      return { ...state, datas: action.payload };
+    case "SET_LINK_COPIED":
+      return { ...state, linkCopied: action.payload };
+    case "SET_ENABLE_ACTIONS":
+      return { ...state, enableActions: action.payload };
+    case "UPDATE_TABS":
+      return { ...state, tabsOptions: action.payload };
+    case "TOGGLE_TAB_VISIBILITY":
+      return {
+        ...state,
+        tabsOptions: state.tabsOptions.map((tab) =>
+          tab.name === action.payload ? { ...tab, isShown: !tab.isShown } : tab
+        ),
+      };
+    default:
+      return state;
+  }
+}
+
+const Task = () => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const [settingData] = useState<SettingData[]>([
     {
@@ -118,86 +159,96 @@ const Task = () => {
 
   const handleOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.toLowerCase();
-    setSearch(value);
-    setLoading(true);
+    dispatch({ type: "SET_SEARCH", payload: value });
+    dispatch({ type: "SET_LOADING", payload: true });
 
     if (value.length > 0) {
-      setTimeout(() => {
-        setIsExpand(true);
-      }, 300);
+      setTimeout(() => dispatch({ type: "SET_EXPAND", payload: true }), 300);
     } else {
-      setTimeout(() => {
-        setIsExpand(false);
-      }, 300);
+      setTimeout(() => dispatch({ type: "SET_EXPAND", payload: false }), 300);
     }
 
     const filterName = dataList.filter((data) =>
       data.name.toLowerCase().includes(value)
     );
 
-    setDatas(filterName);
+    dispatch({ type: "SET_DATAS", payload: filterName });
 
     const peopleCount = filterName.filter(
       (item) => item.type === "people"
     ).length;
     const fileCount = filterName.filter((item) => item.type === "files").length;
 
-    setTabsOptions((prev) =>
-      prev.map((tab) => {
-        if (tab.name === "All") {
-          return { ...tab, count: filterName.length };
-        }
+    const updatedTabs = state.tabsOptions.map((tab) => {
+      if (tab.name === "All") return { ...tab, count: filterName.length };
+      if (tab.name === "People") return { ...tab, count: peopleCount };
+      if (tab.name === "Files") return { ...tab, count: fileCount };
+      return tab;
+    });
 
-        if (tab.name === "People") {
-          return { ...tab, count: peopleCount };
-        }
-        if (tab.name === "Files") {
-          return { ...tab, count: fileCount };
-        }
-        return tab;
-      })
-    );
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
+    dispatch({ type: "UPDATE_TABS", payload: updatedTabs });
+
+    setTimeout(() => dispatch({ type: "SET_LOADING", payload: false }), 1000);
   };
 
+  /** search clear function */
+
   const handleClear = () => {
-    setSearch("");
-    setTimeout(() => {
-      setIsExpand(false);
-      setSearch("");
-    }, 300);
+    dispatch({ type: "SET_SEARCH", payload: "" });
+    setTimeout(() => dispatch({ type: "SET_EXPAND", payload: false }), 300);
   };
 
   const filteredData =
-    activeTab === "All"
-      ? datas
-      : activeTab === "People"
-      ? datas.filter((item) => item.type === "people")
-      : activeTab === "Files"
-      ? datas.filter((item) => item.type === "files")
+    state.activeTab === "All"
+      ? state.datas
+      : state.activeTab === "People"
+      ? state.datas.filter((item) => item.type === "people")
+      : state.activeTab === "Files"
+      ? state.datas.filter((item) => item.type === "files")
       : [];
+
+  /** data copy function */
 
   const handleCopy = (value: string) => {
     navigator.clipboard.writeText(value);
-    console.log("copiedvalue", value);
-    setLinkCopied(value);
+    dispatch({ type: "SET_LINK_COPIED", payload: value });
   };
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        if (state.settingOpen) {
+          dispatch({ type: "SET_SETTING_OPEN", payload: false });
+        }
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [state.settingOpen, dispatch]);
 
   return (
     <div className={styles.container}>
       <div
         className={`${styles.searchContainer} ${
-          isExpand ? styles.expand : styles.notExpand
+          state.isExpand ? styles.expand : styles.notExpand
         }`}
       >
+        {/* header */}
+
         <div className={styles.header}>
           <div className={styles.headerLeft}>
-            {/* <span className={styles.loader}></span> */}
-
             <div className={styles.searchLoaderWrapper}>
-              {loading ? (
+              {state.loading ? (
                 <div className={`${styles.loader} ${styles.pump}`}></div>
               ) : (
                 <RiSearchLine
@@ -206,13 +257,12 @@ const Task = () => {
               )}
             </div>
             <input
+              ref={inputRef}
               type="text"
               className={styles.headerInput}
               placeholder="Searching is easier"
-              value={search}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                handleOnchange(e)
-              }
+              value={state.search}
+              onChange={handleOnchange}
             />
           </div>
           <div className={styles.headerRight}>
@@ -222,24 +272,31 @@ const Task = () => {
           </div>
         </div>
 
+        {/* body */}
+
         <div className={styles.body}>
           <div className={styles.bodyActions}>
             <div className={styles.tabs}>
-              {tabsOptions.map((tab) => {
+              {state.tabsOptions.map((tab) => {
                 return (
                   tab.isShown && (
                     <button
-                      className={`${styles.tabButton} ${
-                        tab.name == activeTab ? styles.active : ""
-                      }`}
                       key={tab.id}
-                      onClick={() => setActiveTab(tab.name)}
+                      className={`${styles.tabButton} ${
+                        tab.name === state.activeTab ? styles.active : ""
+                      }`}
+                      onClick={() =>
+                        dispatch({
+                          type: "SET_ACTIVE_TAB",
+                          payload: tab.name,
+                        })
+                      }
                     >
                       {tab.isIcon && (
                         <span
                           className={styles.tabIcon}
                           style={{
-                            fontSize: tab.iconSize ? tab.iconSize : undefined,
+                            fontSize: tab.iconSize,
                           }}
                         >
                           {tab.isIcon}
@@ -247,7 +304,7 @@ const Task = () => {
                       )}
                       {tab.name}
                       <span className={styles.count}>
-                        {loading ? (
+                        {state.loading ? (
                           0
                         ) : (
                           <CountUp start={0} duration={1} end={tab.count} />
@@ -259,19 +316,25 @@ const Task = () => {
               })}
             </div>
 
-            <div className={styles.settingContainer}>
+            {/* setting container */}
+            <div className={styles.settingContainer} ref={containerRef}>
               <button
                 className={`${styles.settingBtn} ${
-                  settingOpen ? styles.open : styles.close
+                  state.settingOpen ? styles.open : styles.close
                 }`}
-                onClick={() => setSettingOpen((prev) => !prev)}
+                onClick={() =>
+                  dispatch({
+                    type: "SET_SETTING_OPEN",
+                    payload: !state.settingOpen,
+                  })
+                }
               >
                 <IoSettingsOutline />
               </button>
 
               <ul
                 className={`${styles.settingList} ${
-                  settingOpen ? styles.opened : ""
+                  state.settingOpen ? styles.opened : ""
                 }`}
               >
                 {settingData.map((list) => (
@@ -287,8 +350,8 @@ const Task = () => {
                       </span>
                       <span
                         className={`${styles.settingLiName} ${
-                          tabsOptions.some(
-                            (item) => item.name == list.name && item.isShown
+                          state.tabsOptions.some(
+                            (item) => item.name === list.name && item.isShown
                           )
                             ? styles.active
                             : ""
@@ -300,17 +363,14 @@ const Task = () => {
                     <label className={styles.switch}>
                       <input
                         type="checkbox"
-                        checked={tabsOptions.some(
-                          (item) => item.name == list.name && item.isShown
+                        checked={state.tabsOptions.some(
+                          (item) => item.name === list.name && item.isShown
                         )}
                         onChange={() =>
-                          setTabsOptions((prev) =>
-                            prev.map((item) =>
-                              item.name === list.name
-                                ? { ...item, isShown: !item.isShown }
-                                : item
-                            )
-                          )
+                          dispatch({
+                            type: "TOGGLE_TAB_VISIBILITY",
+                            payload: list.name,
+                          })
                         }
                       />
                       <span
@@ -323,8 +383,10 @@ const Task = () => {
             </div>
           </div>
 
+          {/* Data List */}
+
           <div className={styles.bodyListContainer}>
-            {loading ? (
+            {state.loading ? (
               ["1", "2", "3", "4", "5"].map((item) => (
                 <div key={item} className={styles.loaderList}>
                   <Loader />
@@ -337,8 +399,15 @@ const Task = () => {
                   <div
                     key={`${item.id}-${index}`}
                     className={styles.dataList}
-                    onMouseOver={() => setEnableActions(item.id)}
-                    onMouseLeave={() => setEnableActions(null)}
+                    onMouseOver={() =>
+                      dispatch({
+                        type: "SET_ENABLE_ACTIONS",
+                        payload: item.id,
+                      })
+                    }
+                    onMouseLeave={() =>
+                      dispatch({ type: "SET_ENABLE_ACTIONS", payload: null })
+                    }
                   >
                     {item.type == "people" && (
                       <div className={styles.dataListContainer}>
@@ -354,18 +423,21 @@ const Task = () => {
                           </div>
                           <div className={styles.dataListRight}>
                             <p className={styles.dataListName}>
-                              <Highlight text={item.name} highlight={search} />
+                              <Highlight
+                                text={item.name}
+                                highlight={state.search}
+                              />
                             </p>
                             <small className={`${styles.dataListDesc}`}>
                               {item.statusText}
                             </small>
                           </div>
                         </div>
-                        {enableActions == item.id && (
+                        {state.enableActions == item.id && (
                           <DataAction
                             item={item}
                             handleCopy={handleCopy}
-                            linkCopied={linkCopied}
+                            linkCopied={state.linkCopied}
                           />
                         )}
                       </div>
@@ -378,7 +450,10 @@ const Task = () => {
                           </div>
                           <div className={styles.dataListRight}>
                             <p className={styles.dataListName}>
-                              <Highlight text={item.name} highlight={search} />
+                              <Highlight
+                                text={item.name}
+                                highlight={state.search}
+                              />
                             </p>
                             <small className={`${styles.dataListDesc}`}>
                               in <span> {item.location}</span>{" "}
@@ -389,11 +464,11 @@ const Task = () => {
                             </small>
                           </div>
                         </div>
-                        {enableActions == item.id && (
+                        {state.enableActions == item.id && (
                           <DataAction
                             item={item}
                             handleCopy={handleCopy}
-                            linkCopied={linkCopied}
+                            linkCopied={state.linkCopied}
                           />
                         )}
                       </div>

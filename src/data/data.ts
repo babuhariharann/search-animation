@@ -82,7 +82,7 @@ export const dataList: DataItem[] = [
     statusText: "Active now",
   },
  {
-    id: 6,
+    id: 7,
     type: "files",
     icon: IoPlay,
     name: "Dots by Ooloi Labs",
@@ -90,10 +90,10 @@ export const dataList: DataItem[] = [
     lastEdit: "Added 25m ago",
   },
   {
-    id: 3,
+    id: 8,
     type: "files",
     icon: FaImage,
-    name: "Abrar Burk.jpg",
+    name: "John Doe.jpg",
     location: "Photos/Assets",
     lastEdit: "Edited 5m ago",
   },
